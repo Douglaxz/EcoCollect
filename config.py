@@ -1,6 +1,6 @@
 import os
 
-SECRET_KEY = 'estacionamento2023'
+SECRET_KEY = 'ecocollect2023'
 
 
 # conexão com o banco de dados mysql
@@ -10,7 +10,7 @@ SQLALCHEMY_DATABASE_URI = \
         usuario ='root',
         senha = '12345',
         servidor ='localhost',
-        database ='db_estacionamento')
+        database ='db_ecocollect')
 
 #CAMINHO DO UPLOAD (SE DISPONIVEL)
 UPLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
@@ -19,4 +19,4 @@ UPLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
 ROWS_PER_PAGE = 10
 
 #CHAVE DE CRIPTOGRAFIA
-CHAVE = "ESTACIONAMENTO2023"
+CHAVE = "ECOCOLLECT2023"
