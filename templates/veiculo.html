@@ -27,7 +27,8 @@
   <table class="table table-bordered table-responsiv table-hover">
       <thead>
           <tr>
-            <th width="80%">Veículo</th>
+            <th width="40%">Veículo</th>
+            <th width="40%">Tipo</th>
             <th width="10%">Status</th>
             <th width="10%">Ações</th>
           </tr>
@@ -35,7 +36,8 @@
       <tbody>
           {% for veiculo in veiculos.items %}
           <tr>
-              <td class="text-left">{{ veiculo.desc_veiculo }}</td>
+              <td class="text-left">{{ veiculo.placa_veiculo }}</td>
+              <td class="text-left">{{ veiculo.desc_tipoveiculo }}</td>
               <td class="text-left">
                 {% if veiculo.status_veiculo == 0: %}
                 <i class="btn bi bi-toggle-on text-success" style="font-size:2rem; color:white;">

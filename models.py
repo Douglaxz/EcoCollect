@@ -60,3 +60,26 @@ class tb_tiposveiculo(db.Model):
     status_tipoveiculo = db.Column(db.Integer, nullable=False)
     def __repr__(self):
         return '<Name %r>' % self.name    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: VEÍCULO
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_veiculos(db.Model):
+    cod_veiculo = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    placa_veiculo = db.Column(db.String(50), nullable=False)
+    status_veiculo = db.Column(db.Integer, nullable=False)
+    cod_tipoveiculo = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: MOTORISTA
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_motoristas(db.Model):
+    cod_motorista = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome_motorista = db.Column(db.String(50), nullable=False)
+    status_motorista = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name        

@@ -16,11 +16,8 @@
   <fieldset>
     <input type="hidden" name="id" id="id" value="{{id}}">
     {{form.csrf_token()}}
-    <div class="form-group">{{ form.descricao.label(class='form-label') }}
-      {{ form.descricao(class='form-control') }}
-    </div>
-    <div class="form-group">{{ form.marcaveiculo.label(class='form-label') }}
-      {{ form.marcaveiculo(class='form-control') }}
+    <div class="form-group">{{ form.placa.label(class='form-label') }}
+      {{ form.placa(class='form-control') }}
     </div>
     <div class="form-group">{{ form.tipoveiculo.label(class='form-label') }}
       {{ form.tipoveiculo(class='form-control') }}

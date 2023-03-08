@@ -1,7 +1,7 @@
 #importações
 import os
 from ecocollect import app, db
-from models import tb_user, tb_usertype, tb_residuos
+from models import tb_user, tb_usertype, tb_residuos, tb_tiposveiculo, tb_veiculos, tb_motoristas
 from flask_wtf import FlaskForm
 from wtforms import Form, StringField, validators, SubmitField,IntegerField, SelectField,PasswordField,DateField,EmailField,BooleanField,RadioField, TextAreaField, TimeField, TelField, DateTimeLocalField,FloatField, DecimalField 
 
@@ -158,3 +158,53 @@ class frm_visualizar_tipoveiculo(FlaskForm):
     descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
     salvar = SubmitField('Salvar') 
+
+##################################################################################################################################
+#VEÍCULO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: veiculos
+#TIPO: edição
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_veiculo(FlaskForm):
+    placa = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o tipo de veículo"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    tipoveiculo = SelectField('Tipo:', coerce=int, choices=[(g.cod_tipoveiculo, g.desc_tipoveiculo) for g in tb_tiposveiculo.query.order_by('desc_tipoveiculo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: veiculos
+#TIPO: visualização
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_veiculo(FlaskForm):
+    placa = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    tipoveiculo = SelectField('Tipo:', coerce=int, choices=[(g.cod_tipoveiculo, g.desc_tipoveiculo) for g in tb_tiposveiculo.query.order_by('desc_tipoveiculo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar') 
+
+##################################################################################################################################
+#MOTORISTAS
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: motoristas
+#TIPO: edição
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_motorista(FlaskForm):
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do motorista"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: motoristas
+#TIPO: visualização
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_motorista(FlaskForm):
+    nome = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')     
