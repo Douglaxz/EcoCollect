@@ -37,3 +37,15 @@ class tb_residuos(db.Model):
     status_residuo = db.Column(db.Integer, nullable=False)
     def __repr__(self):
         return '<Name %r>' % self.name  
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: DESTINADORES
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_destinadores(db.Model):
+    cod_destinador = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    desc_destinador = db.Column(db.String(50), nullable=False)
+    end_destinador = db.Column(db.String(90), nullable=False)
+    status_destinador = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name    
