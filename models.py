@@ -108,4 +108,3 @@ class tb_pontoscoleta(db.Model):
     status_pontocoleta = db.Column(db.Integer, nullable=False)
     def __repr__(self):
         return '<Name %r>' % self.name        
-    nome_cliente = db.Column(db.String(50), nullable=False)

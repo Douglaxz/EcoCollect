@@ -245,10 +245,9 @@ class frm_visualizar_cliente(FlaskForm):
 #TABELA: tb_pontoscoleta
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_editar_pontocoleta(FlaskForm):
-    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do cliente"})
-    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={"placeholder": "digite o endereço do cliente"})
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do ponto de coleta"})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={"placeholder": "digite o endereço do ponto de coleta"})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
-    cliente = SelectField('Cliente:', coerce=int, choices=[(g.cod_cliente, g.nome_cliente) for g in tb_clientes.query.order_by('nome_cliente')])
     salvar = SubmitField('Salvar')    
 
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -260,5 +259,4 @@ class frm_visualizar_pontocoleta(FlaskForm):
     nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
     endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
-    cliente = SelectField('Cliente:', coerce=int, choices=[(g.cod_cliente, g.nome_cliente) for g in tb_clientes.query.order_by('nome_cliente')], render_kw={'readonly': True})
     salvar = SubmitField('Salvar')   

@@ -1157,11 +1157,18 @@ def visualizarCliente(id):
         flash('Sessão expirou, favor logar novamente','danger')
         return redirect(url_for('login',proxima=url_for('visualizarCliente')))  
     cliente = tb_clientes.query.filter_by(cod_cliente=id).first()
+    pontoscoleta = tb_pontoscoleta.query.filter_by(cod_cliente=cliente.cod_cliente)
+
+
+    pontoscoleta = tb_pontoscoleta.query.order_by(tb_pontoscoleta.nome_pontocoleta)\
+        .filter(tb_pontoscoleta.cod_cliente == id)
+    
+
     form = frm_visualizar_cliente()
     form.nome.data = cliente.nome_cliente
     form.endereco.data = cliente.end_cliente
     form.status.data = cliente.status_cliente
-    return render_template('visualizarCliente.html', titulo='Visualizar Cliente', id=id, form=form)   
+    return render_template('visualizarCliente.html', titulo='Visualizar Cliente', id=id, form=form, pontoscoleta=pontoscoleta)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: editarCliente
@@ -1202,4 +1209,103 @@ def atualizarCliente():
         flash('Cliente atualizado com sucesso!','success')
     else:
         flash('Favor verificar os campos!','danger')
-    return redirect(url_for('visualizarCliente', id=request.form['id']))  
+    return redirect(url_for('visualizarCliente', id=request.form['id']))
+
+##################################################################################################################################
+#PONTO DE COLETA
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoCliente
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoPontoColeta/<int:idcliente>')
+def novoPontoColeta(idcliente):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoPontoColeta'))) 
+    form = frm_editar_pontocoleta()
+    return render_template('novoPontoColeta.html', titulo='Novo Ponto Coleta', form=form, idcliente=idcliente)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarPontoColeta
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarPontoColeta/<int:idcliente>', methods=['POST','GET'])
+def criarPontoColeta(idcliente):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoPontoColeta',idcliente=idcliente)))     
+    form = frm_editar_pontocoleta(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('novoPontoColeta',idcliente=idcliente))
+    nome  = form.nome.data
+    endereco  = form.endereco.data
+    status = form.status.data
+    novoPontoColeta = tb_pontoscoleta(nome_pontocoleta=nome, end_pontocoleta=endereco, status_pontocoleta=status, cod_cliente=idcliente)
+    flash('Ponto Coleta criado com sucesso!','success')
+    db.session.add(novoPontoColeta)
+    db.session.commit()
+    return redirect(url_for('visualizarCliente',id=idcliente))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarPontoColeta
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarPontoColeta/<int:id>')
+def visualizarPontoColeta(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarPontoColeta')))  
+    pontocoleta = tb_pontoscoleta.query.filter_by(cod_pontocoleta=id).first()
+
+    form = frm_visualizar_pontocoleta()
+    form.nome.data = pontocoleta.nome_pontocoleta
+    form.endereco.data = pontocoleta.end_pontocoleta
+    form.status.data = pontocoleta.status_pontocoleta
+    return render_template('visualizarPontoColeta.html', titulo='Visualizar Ponto de Coleta', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarPontoColeta
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarPontoColeta/<int:id>')
+def editarPontoColeta(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarPontoColeta')))  
+    pontocoleta = tb_pontoscoleta.query.filter_by(cod_pontocoleta=id).first()
+    form = frm_editar_pontocoleta()
+    form.nome.data = pontocoleta.nome_pontocoleta
+    form.endereco.data = pontocoleta.end_pontocoleta
+    form.status.data = pontocoleta.status_pontocoleta
+    return render_template('editarPontoColeta.html', titulo='Editar Ponto de Coleta', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarPontoColeta
+#FUNÇÃO: alteraçõa no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarPontoColeta', methods=['POST',])
+def atualizarPontoColeta():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarPontoColeta')))      
+    form = frm_editar_pontocoleta(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        pontocoleta = tb_pontoscoleta.query.filter_by(cod_pontocoleta=request.form['id']).first()
+        pontocoleta.nome_pontocoleta = form.nome.data
+        pontocoleta.end_pontocoleta = form.endereco.data
+        pontocoleta.status_pontocoleta = form.status.data
+        db.session.add(pontocoleta)
+        db.session.commit()
+        flash('Ponto de coleta atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarPontoColeta', id=request.form['id']))  
