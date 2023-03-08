@@ -82,4 +82,30 @@ class tb_motoristas(db.Model):
     nome_motorista = db.Column(db.String(50), nullable=False)
     status_motorista = db.Column(db.Integer, nullable=False)
     def __repr__(self):
+        return '<Name %r>' % self.name
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: CLIENTES
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_clientes(db.Model):
+    cod_cliente = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome_cliente = db.Column(db.String(50), nullable=False)
+    end_cliente = db.Column(db.String(90), nullable=False)
+    status_cliente = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: PONTOS DE COLETA
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_pontoscoleta(db.Model):
+    cod_pontocoleta = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cod_cliente = db.Column(db.Integer, nullable=False)
+    nome_pontocoleta = db.Column(db.String(50), nullable=False)
+    end_pontocoleta = db.Column(db.String(90), nullable=False)
+    status_pontocoleta = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
         return '<Name %r>' % self.name        
+    nome_cliente = db.Column(db.String(50), nullable=False)

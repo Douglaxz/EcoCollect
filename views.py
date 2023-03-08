@@ -12,7 +12,9 @@ from models import tb_user,\
     tb_destinadores,\
     tb_tiposveiculo,\
     tb_veiculos,\
-    tb_motoristas
+    tb_motoristas,\
+    tb_clientes,\
+    tb_pontoscoleta
 from helpers import \
     frm_pesquisa, \
     frm_editar_senha,\
@@ -29,7 +31,11 @@ from helpers import \
     frm_editar_veiculo,\
     frm_visualizar_veiculo,\
     frm_editar_motorista,\
-    frm_visualizar_motorista
+    frm_visualizar_motorista,\
+    frm_editar_cliente,\
+    frm_visualizar_cliente,\
+    frm_editar_pontocoleta,\
+    frm_visualizar_pontocoleta
 
 
 # ITENS POR PÁGINA
@@ -1070,3 +1076,130 @@ def atualizarMotorista():
     else:
         flash('Favor verificar os campos!','danger')
     return redirect(url_for('visualizarMotorista', id=request.form['id']))
+
+##################################################################################################################################
+#CLIENTE
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: cliente
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/cliente', methods=['POST','GET'])
+def cliente():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('cliente')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        clientes = tb_clientes.query.order_by(tb_clientes.nome_cliente)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        clientes = tb_clientes.query.order_by(tb_clientes.desc_destinador)\
+        .filter(tb_clientes.nome_cliente.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('cliente.html', titulo='Clientes', clientes=clientes, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoCliente
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoCliente')
+def novoCliente():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoCliente'))) 
+    form = frm_editar_cliente()
+    return render_template('novoCliente.html', titulo='Novo Cliente', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarCliente
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarCliente', methods=['POST',])
+def criarCliente():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarCliente')))     
+    form = frm_editar_cliente(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarCliente'))
+    nome  = form.nome.data
+    endereco  = form.endereco.data
+    status = form.status.data
+    cliente = tb_clientes.query.filter_by(nome_cliente=nome).first()
+    if cliente:
+        flash ('Cliente já existe','danger')
+        return redirect(url_for('cliente')) 
+    novoCliente = tb_clientes(nome_cliente=nome, end_cliente=endereco, status_cliente=status)
+    flash('Cliente criado com sucesso!','success')
+    db.session.add(novoCliente)
+    db.session.commit()
+    return redirect(url_for('cliente'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarCliente
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarCliente/<int:id>')
+def visualizarCliente(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarCliente')))  
+    cliente = tb_clientes.query.filter_by(cod_cliente=id).first()
+    form = frm_visualizar_cliente()
+    form.nome.data = cliente.nome_cliente
+    form.endereco.data = cliente.end_cliente
+    form.status.data = cliente.status_cliente
+    return render_template('visualizarCliente.html', titulo='Visualizar Cliente', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarCliente
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarCliente/<int:id>')
+def editarCliente(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarCliente')))  
+    cliente = tb_clientes.query.filter_by(cod_cliente=id).first()
+    form = frm_editar_cliente()
+    form.nome.data = cliente.nome_cliente
+    form.endereco.data = cliente.end_cliente
+    form.status.data = cliente.status_cliente
+    return render_template('editarCliente.html', titulo='Editar Cliente', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarCliente
+#FUNÇÃO: alteraçõa no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarCliente', methods=['POST',])
+def atualizarCliente():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarCliente')))      
+    form = frm_editar_cliente(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        cliente = tb_clientes.query.filter_by(cod_cliente=request.form['id']).first()
+        cliente.nome_cliente = form.nome.data
+        cliente.end_cliente = form.endereco.data
+        cliente.status_cliente = form.status.data
+        db.session.add(cliente)
+        db.session.commit()
+        flash('Cliente atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarCliente', id=request.form['id']))  

@@ -1,7 +1,7 @@
 #importações
 import os
 from ecocollect import app, db
-from models import tb_user, tb_usertype, tb_residuos, tb_tiposveiculo, tb_veiculos, tb_motoristas
+from models import tb_user, tb_usertype, tb_residuos, tb_tiposveiculo, tb_veiculos, tb_motoristas,tb_clientes
 from flask_wtf import FlaskForm
 from wtforms import Form, StringField, validators, SubmitField,IntegerField, SelectField,PasswordField,DateField,EmailField,BooleanField,RadioField, TextAreaField, TimeField, TelField, DateTimeLocalField,FloatField, DecimalField 
 
@@ -131,7 +131,7 @@ class frm_editar_destinador(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_destinador(FlaskForm):
     descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
-    endereco = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
     salvar = SubmitField('Salvar')    
 
@@ -142,7 +142,7 @@ class frm_visualizar_destinador(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: tipoveiculos
 #TIPO: edição
-#TABELA: tb_destinadores
+#TABELA: tb_tipoveiculo
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_editar_tipoveiculo(FlaskForm):
     descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o tipo de veículo"})
@@ -152,7 +152,7 @@ class frm_editar_tipoveiculo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: tipoveiculos
 #TIPO: visualização
-#TABELA: tb_destinadores
+#TABELA: tb_tipoveiculo
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_tipoveiculo(FlaskForm):
     descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
@@ -166,7 +166,7 @@ class frm_visualizar_tipoveiculo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: veiculos
 #TIPO: edição
-#TABELA: tb_destinadores
+#TABELA: tb_veiculos
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_editar_veiculo(FlaskForm):
     placa = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o tipo de veículo"})
@@ -177,7 +177,7 @@ class frm_editar_veiculo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: veiculos
 #TIPO: visualização
-#TABELA: tb_destinadores
+#TABELA: tb_veiculos
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_veiculo(FlaskForm):
     placa = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
@@ -192,7 +192,7 @@ class frm_visualizar_veiculo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: motoristas
 #TIPO: edição
-#TABELA: tb_destinadores
+#TABELA: tb_motorista
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_editar_motorista(FlaskForm):
     nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do motorista"})
@@ -202,9 +202,63 @@ class frm_editar_motorista(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: motoristas
 #TIPO: visualização
-#TABELA: tb_destinadores
+#TABELA: tb_motorista
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_motorista(FlaskForm):
     nome = StringField('Placa:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
-    salvar = SubmitField('Salvar')     
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#CLIENTES
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: clientes
+#TIPO: edição
+#TABELA: tb_clientes
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_cliente(FlaskForm):
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do cliente"})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={"placeholder": "digite o endereço do cliente"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: clientes
+#TIPO: visualização
+#TABELA: tb_clientes
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_cliente(FlaskForm):
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#PONTOS DE COLETA
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: pontos coleta
+#TIPO: edição
+#TABELA: tb_pontoscoleta
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_pontocoleta(FlaskForm):
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do cliente"})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={"placeholder": "digite o endereço do cliente"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    cliente = SelectField('Cliente:', coerce=int, choices=[(g.cod_cliente, g.nome_cliente) for g in tb_clientes.query.order_by('nome_cliente')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: pontos coleta
+#TIPO: visualização
+#TABELA: tb_pontoscoleta
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_pontocoleta(FlaskForm):
+    nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    cliente = SelectField('Cliente:', coerce=int, choices=[(g.cod_cliente, g.nome_cliente) for g in tb_clientes.query.order_by('nome_cliente')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')   
