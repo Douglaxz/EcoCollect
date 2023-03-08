@@ -102,7 +102,7 @@ class frm_editar_residuo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: residuos
 #TIPO: visualização
-#TABELA: tb_usertype
+#TABELA: tb_residuos
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_residuo(FlaskForm):
     descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
@@ -116,21 +116,45 @@ class frm_visualizar_residuo(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: destinadores
 #TIPO: edição
-#TABELA: tb_residuos
+#TABELA: tb_destinadores
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_editar_destinador(FlaskForm):
-    descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite a descrição do resíduo"})
-    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite a descrição do resíduo"})
+    descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do destinador"})
+    endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={"placeholder": "digite o endereço do destinador"})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
     salvar = SubmitField('Salvar')    
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #FORMUÁRIO: destinadores
 #TIPO: visualização
-#TABELA: tb_usertype
+#TABELA: tb_destinadores
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_destinador(FlaskForm):
     descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
-    endereco = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    endereco = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
     salvar = SubmitField('Salvar')    
+
+##################################################################################################################################
+#TIPO VEÍCULO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: tipoveiculos
+#TIPO: edição
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_tipoveiculo(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o tipo de veículo"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: tipoveiculos
+#TIPO: visualização
+#TABELA: tb_destinadores
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_tipoveiculo(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar') 

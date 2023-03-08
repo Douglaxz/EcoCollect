@@ -2,13 +2,13 @@
 {% block conteudo %}
 <div class="box_cabecalho">
   <div class="box_titulo_interno">
-    <i class="bi bi-shield-check" data-toggle="tooltip" data-placement="right" title="Tipo Veículo"></i> {{ titulo }}
+    <i class="bi bi-box2" data-toggle="tooltip" data-placement="right"></i> {{ titulo }}
   </div>
   <div class="box_botoes">
-    <a class="btn btn_titulo" href="{{url_for('editarMarcaVeiculo',id=id)}}"><i class="bi bi-pencil" style="font-size:1.5rem; color:white;"></i></a>
+    <a class="btn btn_titulo" href="{{url_for('editarDestinador',id=id)}}"><i class="bi bi-pencil" style="font-size:1.5rem; color:white;"></i></a>
   </div>
   <div class="box_botoes">
-    <a class="btn btn_titulo" href="{{url_for('marcaveiculo')}}"><i class="bi bi-reply" style="font-size:1.5rem; color:white;"></i></a>
+    <a class="btn btn_titulo" href="{{url_for('destinador')}}"><i class="bi bi-reply" style="font-size:1.5rem; color:white;"></i></a>
   </div>
 </div>
 <div class="boxformulario">
@@ -18,6 +18,10 @@
       {{form.descricao.label(class="form-label")}}
       {{form.descricao(class="form-control")}}
     </div>
+    <div class="form-group">
+      {{form.endereco.label(class="form-label")}}
+      {{form.endereco(class="form-control")}}
+    </div>    
     <div class="form-group">
       {{form.status.label(class="form-label")}}
       {{form.status(class="form-control")}}

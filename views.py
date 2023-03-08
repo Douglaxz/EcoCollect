@@ -8,7 +8,9 @@ from ecocollect import app, db
 from sqlalchemy import func
 from models import tb_user,\
     tb_usertype,\
-    tb_residuos
+    tb_residuos,\
+    tb_destinadores,\
+    tb_tiposveiculo
 from helpers import \
     frm_pesquisa, \
     frm_editar_senha,\
@@ -17,7 +19,11 @@ from helpers import \
     frm_visualizar_tipousuario,\
     frm_editar_tipousuario,\
     frm_editar_residuo,\
-    frm_visualizar_residuo
+    frm_visualizar_residuo,\
+    frm_editar_destinador,\
+    frm_visualizar_destinador,\
+    frm_editar_tipoveiculo,\
+    frm_visualizar_tipoveiculo
 
 
 # ITENS POR PÁGINA
@@ -554,3 +560,253 @@ def atualizarResiduo():
     else:
         flash('Favor verificar os campos!','danger')
     return redirect(url_for('visualizarResiduo', id=request.form['id']))    
+
+##################################################################################################################################
+#DESTINADORES
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: destinador
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/destinador', methods=['POST','GET'])
+def destinador():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('destinador')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        destinadores = tb_destinadores.query.order_by(tb_destinadores.desc_destinador)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        destinadores = tb_destinadores.query.order_by(tb_destinadores.desc_destinador)\
+        .filter(tb_destinadores.desc_destinador.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('destinador.html', titulo='Destinadores', destinadores=destinadores, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoDestinador
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoDestinador')
+def novoDestinador():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoDestinador'))) 
+    form = frm_editar_destinador()
+    return render_template('novoDestinador.html', titulo='Novo Destinador', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarDestinador
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarDestinador', methods=['POST',])
+def criarDestinador():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarDestinador')))     
+    form = frm_editar_destinador(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarResiduo'))
+    desc  = form.descricao.data
+    endereco  = form.endereco.data
+    status = form.status.data
+    destinador = tb_destinadores.query.filter_by(desc_destinador=desc).first()
+    if destinador:
+        flash ('Destinador já existe','danger')
+        return redirect(url_for('residuo')) 
+    novoDestinador = tb_destinadores(desc_destinador=desc, end_destinador=endereco, status_destinador=status)
+    flash('Destinador criado com sucesso!','success')
+    db.session.add(novoDestinador)
+    db.session.commit()
+    return redirect(url_for('destinador'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarDestinador
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarDestinador/<int:id>')
+def visualizarDestinador(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarDestinador')))  
+    destinador = tb_destinadores.query.filter_by(cod_destinador=id).first()
+    form = frm_visualizar_destinador()
+    form.descricao.data = destinador.desc_destinador
+    form.endereco.data = destinador.end_destinador
+    form.status.data = destinador.status_destinador
+    return render_template('visualizarDestinador.html', titulo='Visualizar Destinador', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarDestinador
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarDestinador/<int:id>')
+def editarDestinador(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarDestinador')))  
+    destinador = tb_destinadores.query.filter_by(cod_destinador=id).first()
+    form = frm_editar_destinador()
+    form.descricao.data = destinador.desc_destinador
+    form.endereco.data = destinador.end_destinador
+    form.status.data = destinador.status_destinador
+    return render_template('editarDestinador.html', titulo='Editar Destinador', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarDestinador
+#FUNÇÃO: alteraçõa no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarDestinador', methods=['POST',])
+def atualizarDestinador():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarDestinador')))      
+    form = frm_editar_destinador(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        destinador = tb_destinadores.query.filter_by(cod_destinador=request.form['id']).first()
+        destinador.desc_destinador = form.descricao.data
+        destinador.end_destinador = form.endereco.data
+        destinador.status_destinador = form.status.data
+        db.session.add(destinador)
+        db.session.commit()
+        flash('Destinador atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarDestinador', id=request.form['id']))  
+
+##################################################################################################################################
+#TIPO VEICULO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: tipoveiculo
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/tipoveiculo', methods=['POST','GET'])
+def tipoveiculo():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('tipoveiculo')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        tiposveiculo = tb_tiposveiculo.query.order_by(tb_tiposveiculo.desc_tipoveiculo)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        tiposveiculo = tb_tiposveiculo.query.order_by(tb_tiposveiculo.desc_tipoveiculo)\
+        .filter(tb_tiposveiculo.desc_tipoveiculo.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('tipoveiculo.html', titulo='Tipo Veículo', tiposveiculo=tiposveiculo, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoTipoVeiculo
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoTipoVeiculo')
+def novoTipoVeiculo():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoTipoVeiculo'))) 
+    form = frm_editar_tipoveiculo()
+    return render_template('novoTipoVeiculo.html', titulo='Novo Tipo Veículo', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarTipoVeiculo
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarTipoVeiculo', methods=['POST',])
+def criarTipoVeiculo():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarTipoVeiculo')))     
+    form = frm_editar_tipoveiculo(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarResiduo'))
+    desc  = form.descricao.data
+    status = form.status.data
+    tipoveiculo = tb_tiposveiculo.query.filter_by(desc_tipoveiculo=desc).first()
+    if tipoveiculo:
+        flash ('Tipo veículo já existe','danger')
+        return redirect(url_for('tipoveiculo')) 
+    novoTipoVeiculo = tb_tiposveiculo(desc_tipoveiculo=desc, status_tipoveiculo=status)
+    flash('Tipo veículo criado com sucesso!','success')
+    db.session.add(novoTipoVeiculo)
+    db.session.commit()
+    return redirect(url_for('tipoveiculo'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarTipoVeiculo
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarTipoVeiculo/<int:id>')
+def visualizarTipoVeiculo(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarTipoVeiculo')))  
+    tipoveiculo = tb_tiposveiculo.query.filter_by(cod_tipoveiculo=id).first()
+    form = frm_visualizar_tipoveiculo()
+    form.descricao.data = tipoveiculo.desc_tipoveiculo
+    form.status.data = tipoveiculo.status_tipoveiculo
+    return render_template('visualizarTipoVeiculo.html', titulo='Visualizar Tipo Veículo', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarTipoVeiculo
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarTipoVeiculo/<int:id>')
+def editarTipoVeiculo(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarTipoVeiculo')))  
+    tipoveiculo = tb_tiposveiculo.query.filter_by(cod_tipoveiculo=id).first()
+    form = frm_editar_tipoveiculo()
+    form.descricao.data = tipoveiculo.desc_tipoveiculo
+    form.status.data = tipoveiculo.status_tipoveiculo
+    return render_template('editarTipoVeiculo.html', titulo='Editar Tipo Veículo', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarTipoVeiculo
+#FUNÇÃO: alteraçõa no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarTipoVeiculo', methods=['POST',])
+def atualizarTipoVeiculo():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarTipoVeiculo')))      
+    form = frm_editar_tipoveiculo(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        tipoveiculo = tb_tiposveiculo.query.filter_by(cod_tipoveiculo=request.form['id']).first()
+        tipoveiculo.desc_tipoveiculo = form.descricao.data
+        tipoveiculo.status_tipoveiculo = form.status.data
+        db.session.add(tipoveiculo)
+        db.session.commit()
+        flash('Tipo Veículo atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarTipoVeiculo', id=request.form['id']))  
