@@ -14,7 +14,9 @@ from models import tb_user,\
     tb_veiculos,\
     tb_motoristas,\
     tb_clientes,\
-    tb_pontoscoleta
+    tb_pontoscoleta,\
+    tb_periodicidade,\
+    tb_acondicionamento
 from helpers import \
     frm_pesquisa, \
     frm_editar_senha,\
@@ -35,7 +37,11 @@ from helpers import \
     frm_editar_cliente,\
     frm_visualizar_cliente,\
     frm_editar_pontocoleta,\
-    frm_visualizar_pontocoleta
+    frm_visualizar_pontocoleta,\
+    frm_editar_acondicionamento,\
+    frm_visualizar_acondicionamento,\
+    frm_editar_periodicidade,\
+    frm_visualizar_periodicidade
 
 
 # ITENS POR PÁGINA
@@ -1309,3 +1315,249 @@ def atualizarPontoColeta():
     else:
         flash('Favor verificar os campos!','danger')
     return redirect(url_for('visualizarPontoColeta', id=request.form['id']))  
+
+##################################################################################################################################
+#ACONDICIONAMENTO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: acondicionamento
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/acondicionamento', methods=['POST','GET'])
+def acondicionamento():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('acondicionamento')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        acondicionamentos = tb_acondicionamento.query.order_by(tb_acondicionamento.desc_acondicionamento)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        acondicionamentos = tb_acondicionamento.query.order_by(tb_acondicionamento.desc_acondicionamento)\
+        .filter(tb_acondicionamento.desc_acondicionamento.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('acondicionamento.html', titulo='Acondicionamento', acondicionamentos=acondicionamentos, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoAcondicionamento
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoAcondicionamento')
+def novoAcondicionamento():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoAcondicionamento'))) 
+    form = frm_editar_acondicionamento()
+    return render_template('novoAcondicionamento.html', titulo='Novo Acondicionamento', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarAcondicionamento
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarAcondicionamento', methods=['POST',])
+def criarAcondicionamento():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarAcondicionamento')))     
+    form = frm_editar_acondicionamento(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarAcondicionamento'))
+    desc  = form.descricao.data
+    status = form.status.data
+    acondicionamento = tb_acondicionamento.query.filter_by(desc_acondicionamento=desc).first()
+    if acondicionamento:
+        flash ('Acondicionamento já existe','danger')
+        return redirect(url_for('acondicionamento')) 
+    novoAcondicionamento = tb_acondicionamento(desc_acondicionamento=desc, status_acondicionamento=status)
+    flash('Acondicionamento criado com sucesso!','success')
+    db.session.add(novoAcondicionamento)
+    db.session.commit()
+    return redirect(url_for('acondicionamento'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarAcondicionamento
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarAcondicionamento/<int:id>')
+def visualizarAcondicionamento(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarAcondicionamento')))  
+    acondicionamento = tb_acondicionamento.query.filter_by(cod_acondicionamento=id).first()
+    form = frm_visualizar_acondicionamento()
+    form.descricao.data = acondicionamento.desc_acondicionamento
+    form.status.data = acondicionamento.status_acondicionamento
+    return render_template('visualizarAcondicionamento.html', titulo='Visualizar Acondicionamento', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarAcondicionamento
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarAcondicionamento/<int:id>')
+def editarAcondicionamento(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarAcondicionamento')))  
+    acondicionamento = tb_acondicionamento.query.filter_by(cod_acondicionamento=id).first()
+    form = frm_editar_acondicionamento()
+    form.descricao.data = acondicionamento.desc_acondicionamento
+    form.status.data = acondicionamento.status_acondicionamento
+    return render_template('editarAcondicionamento.html', titulo='Editar Acondicionamento', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarAcondicionamento
+#FUNÇÃO: alteração no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarAcondicionamento', methods=['POST',])
+def atualizarAcondicionamento():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarAcondicionamento')))      
+    form = frm_editar_acondicionamento(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        acondicionamento = tb_acondicionamento.query.filter_by(cod_acondicionamento=request.form['id']).first()
+        acondicionamento.desc_acondicionamento = form.descricao.data
+        acondicionamento.status_acondicionamento = form.status.data
+        db.session.add(acondicionamento)
+        db.session.commit()
+        flash('Acondicionamento atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarAcondicionamento', id=request.form['id']))   
+
+##################################################################################################################################
+#PERIODICIDADE
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: periodicidade
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/periodicidade', methods=['POST','GET'])
+def periodicidade():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('periodicidade')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        periodicidades = tb_periodicidade.query.order_by(tb_periodicidade.desc_periodicidade)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        periodicidades = tb_periodicidade.query.order_by(tb_periodicidade.desc_periodicidade)\
+        .filter(tb_periodicidade.desc_periodicidade.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('periodicidade.html', titulo='Periodicidade', periodicidade=periodicidades, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoPeriodicidade
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoPeriodicidade')
+def novoPeriodicidade():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoPeriodicidade'))) 
+    form = frm_editar_residuo()
+    return render_template('novoPeriodicidade.html', titulo='Nova Periodicidade', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarPeriodicidade
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarPeriodicidade', methods=['POST',])
+def criarPeriodicidade():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarPeriodicidade')))     
+    form = frm_editar_periodicidade(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarPeriodicidade'))
+    desc  = form.descricao.data
+    status = form.status.data
+    periodicidade = tb_periodicidade.query.filter_by(desc_periodicidade=desc).first()
+    if periodicidade:
+        flash ('Periodicidade já existe','danger')
+        return redirect(url_for('periodicidade')) 
+    novoPeriodicidade = tb_periodicidade(desc_periodicidade=desc, status_periodicidade=status)
+    flash('Periodicidade criada com sucesso!','success')
+    db.session.add(novoPeriodicidade)
+    db.session.commit()
+    return redirect(url_for('periodicidade'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarPeriodicidade
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarPeriodicidade/<int:id>')
+def visualizarPeriodicidade(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarPeriodicidade')))  
+    periodicidade = tb_periodicidade.query.filter_by(cod_periodicidade=id).first()
+    form = frm_visualizar_periodicidade()
+    form.descricao.data = periodicidade.desc_periodicidade
+    form.status.data = periodicidade.status_periodicidade
+    return render_template('visualizarPeriodicidade.html', titulo='Visualizar Periodicidade', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarPeriodicidade
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarPeriodicidade/<int:id>')
+def editarPeriodicidade(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarPeriodicidade')))  
+    periodicidade = tb_periodicidade.query.filter_by(cod_periodicidade=id).first()
+    form = frm_editar_periodicidade()
+    form.descricao.data = periodicidade.desc_periodicidade
+    form.status.data = periodicidade.status_periodicidade
+    return render_template('editarPeriodicidade.html', titulo='Editar Periodicidade', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarPeriodicidade
+#FUNÇÃO: alteração no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarPeriodicidade', methods=['POST',])
+def atualizarPeriodicidade():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarPeriodicidade')))      
+    form = frm_editar_periodicidade(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        periodicidade = tb_periodicidade.query.filter_by(cod_periodicidade=request.form['id']).first()
+        periodicidade.desc_periodicidade = form.descricao.data
+        periodicidade.status_periodicidade = form.status.data
+        db.session.add(periodicidade)
+        db.session.commit()
+        flash('Periodicidade atualizado com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarPeriodicidade', id=request.form['id'])) 

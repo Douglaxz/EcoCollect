@@ -259,4 +259,52 @@ class frm_visualizar_pontocoleta(FlaskForm):
     nome = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
     endereco = StringField('Endereço:', [validators.DataRequired(), validators.Length(min=1, max=90)], render_kw={'readonly': True})
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
-    salvar = SubmitField('Salvar')   
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#ACONDICIONAMENTO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: acondicionamento
+#TIPO: edição
+#TABELA: tb_acondicionamento
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_acondicionamento(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome do acondicionamento"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: acondicionamento
+#TIPO: visualização
+#TABELA: tb_acondicionamento
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_acondicionamento(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#PERIODICIDADE
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: periodicidade
+#TIPO: edição
+#TABELA: tb_periodicidade
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_periodicidade(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome da periodicidade"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: periodicidade
+#TIPO: visualização
+#TABELA: tb_periodicidade
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_periodicidade(FlaskForm):
+    descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')  

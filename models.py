@@ -107,4 +107,26 @@ class tb_pontoscoleta(db.Model):
     end_pontocoleta = db.Column(db.String(90), nullable=False)
     status_pontocoleta = db.Column(db.Integer, nullable=False)
     def __repr__(self):
-        return '<Name %r>' % self.name        
+        return '<Name %r>' % self.name
+    
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: ACONDICIONAMENTO
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_acondicionamento(db.Model):
+    cod_acondicionamento = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    desc_acondicionamento = db.Column(db.String(50), nullable=False)
+    status_acondicionamento = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: PERIODICIDADE
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_periodicidade(db.Model):
+    cod_periodicidade = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    desc_periodicidade = db.Column(db.String(50), nullable=False)
+    status_periodicidade = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name    
