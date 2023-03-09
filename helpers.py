@@ -1,7 +1,7 @@
 #importações
 import os
 from ecocollect import app, db
-from models import tb_user, tb_usertype, tb_residuos, tb_tiposveiculo, tb_veiculos, tb_motoristas,tb_clientes
+from models import tb_user, tb_usertype, tb_residuos, tb_tiposveiculo, tb_veiculos, tb_motoristas,tb_clientes, tb_periodicidade, tb_acondicionamento
 from flask_wtf import FlaskForm
 from wtforms import Form, StringField, validators, SubmitField,IntegerField, SelectField,PasswordField,DateField,EmailField,BooleanField,RadioField, TextAreaField, TimeField, TelField, DateTimeLocalField,FloatField, DecimalField 
 
@@ -306,5 +306,35 @@ class frm_editar_periodicidade(FlaskForm):
 #---------------------------------------------------------------------------------------------------------------------------------
 class frm_visualizar_periodicidade(FlaskForm):
     descricao = StringField('Descrição:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#PONTO COLETA / RESIDUO
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: pontocoleta_residuo
+#TIPO: edição
+#TABELA: tb_periodicidade
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_pontocoleta_residuo(FlaskForm):
+    residuo = SelectField('Resíduo:', coerce=int, choices=[(g.cod_residuo, g.desc_residuo) for g in tb_residuos.query.order_by('desc_residuo')])
+    acondicionamento = SelectField('Acondicionamento:', coerce=int, choices=[(g.cod_acondicionamento, g.desc_acondicionamento) for g in tb_acondicionamento.query.order_by('desc_acondicionamento')])
+    periodicidade = SelectField('Periodicidade:', coerce=int, choices=[(g.cod_periodicidade, g.desc_periodicidade) for g in tb_periodicidade.query.order_by('desc_periodicidade')])
+    tipoveiculo = SelectField('Veículo:', coerce=int, choices=[(g.cod_tipoveiculo, g.desc_tipoveiculo) for g in tb_tiposveiculo.query.order_by('desc_tipoveiculo')])
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: pontocoleta_residuo
+#TIPO: visualização
+#TABELA: tb_periodicidade
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_pontocoleta_residuo(FlaskForm):
+    residuo = SelectField('Resíduo:', coerce=int, choices=[(g.cod_residuo, g.desc_residuo) for g in tb_residuos.query.order_by('desc_residuo')])
+    acondicionamento = SelectField('Acondicionamento:', coerce=int, choices=[(g.cod_acondicionamento, g.desc_acondicionamento) for g in tb_acondicionamento.query.order_by('desc_acondicionamento')])
+    periodicidade = SelectField('Periodicidade:', coerce=int, choices=[(g.cod_periodicidade, g.desc_periodicidade) for g in tb_periodicidade.query.order_by('desc_periodicidade')])
+    tipoveiculo = SelectField('Veículo:', coerce=int, choices=[(g.cod_tipoveiculo, g.desc_tipoveiculo) for g in tb_tiposveiculo.query.order_by('desc_tipoveiculo')])
     status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
     salvar = SubmitField('Salvar')  

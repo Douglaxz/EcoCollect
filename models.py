@@ -130,3 +130,18 @@ class tb_periodicidade(db.Model):
     status_periodicidade = db.Column(db.Integer, nullable=False)
     def __repr__(self):
         return '<Name %r>' % self.name    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: PONTO S DE COLETA RESIDUO
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_pontocoleta_residuo(db.Model):
+    cod_pontocoleta_residuo = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cod_pontocoleta = db.Column(db.Integer, nullable=False)
+    cod_residuo = db.Column(db.Integer, nullable=False)
+    cod_acondicionamento = db.Column(db.Integer, nullable=False)
+    cod_periodicidade = db.Column(db.Integer, nullable=False)
+    cod_tipoveiculo = db.Column(db.Integer, nullable=False)
+    status_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name

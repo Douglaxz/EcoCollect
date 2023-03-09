@@ -48,7 +48,7 @@
           {% for pontocoleta in pontoscoleta %}
           <tr>
               <td class="text-left">{{ pontocoleta.nome_pontocoleta }}</td>
-              <td class="text-left">{{ pontocoleta.end_pontocoleta }}</td>
+              <td class="text-left">{{ pontocoleta.end_pontocoleta }}|{{ pontocoleta.cod_pontocoleta }}</td>
               <td class="text-left">
                 {% if pontocoleta.status_pontocoleta == 0: %}
                 <i class="btn bi bi-toggle-on text-success" style="font-size:2rem; color:white;">
@@ -56,7 +56,7 @@
                 <i class="btn bi bi-toggle-off text-danger" style="font-size:2rem; color:white;">
                 {% endif %}                       
               <td>
-                <a class="btn" href="{{url_for('visualizarPontoColeta',id=id, idpontocoleta=pontocoleta.cod_pontocoleta)}}"><i class="bi bi-eye" style="font-size:1.5rem; color:black;"></i></a>
+                <a class="btn" href="{{url_for('visualizarPontoColeta',idpontocoleta=pontocoleta.cod_pontocoleta)}}"><i class="bi bi-eye" style="font-size:1.5rem; color:black;"></i></a>
             </td>              
           </tr>
           {% endfor %}
