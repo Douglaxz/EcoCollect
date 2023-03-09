@@ -1466,7 +1466,7 @@ def periodicidade():
         periodicidades = tb_periodicidade.query.order_by(tb_periodicidade.desc_periodicidade)\
         .filter(tb_periodicidade.desc_periodicidade.ilike(f'%{pesquisa}%'))\
         .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
-    return render_template('periodicidade.html', titulo='Periodicidade', periodicidade=periodicidades, form=form)
+    return render_template('periodicidade.html', titulo='Periodicidade', periodicidades=periodicidades, form=form)
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: novoPeriodicidade
