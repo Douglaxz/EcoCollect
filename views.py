@@ -1176,7 +1176,8 @@ def visualizarCliente(id):
     form.nome.data = cliente.nome_cliente
     form.endereco.data = cliente.end_cliente
     form.status.data = cliente.status_cliente
-    return render_template('visualizarCliente.html', titulo='Visualizar Cliente', id=id, form=form, pontoscoleta=pontoscoleta)   
+    endereco = cliente.end_cliente
+    return render_template('visualizarCliente.html', titulo='Visualizar Cliente', id=id, form=form, pontoscoleta=pontoscoleta,endereco=endereco)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: editarCliente
@@ -1528,7 +1529,8 @@ def visualizarPontoColeta(idpontocoleta):
     form.nome.data = pontocoleta.nome_pontocoleta
     form.endereco.data = pontocoleta.end_pontocoleta
     form.status.data = pontocoleta.status_pontocoleta
-    return render_template('visualizarPontoColeta.html', titulo='Visualizar Ponto de Coleta', id=id, form=form, idpontocoleta=idpontocoleta,residuospontocoleta=residuospontocoleta)   
+    endereco=pontocoleta.end_pontocoleta
+    return render_template('visualizarPontoColeta.html', titulo='Visualizar Ponto de Coleta', id=id, form=form, idpontocoleta=idpontocoleta,residuospontocoleta=residuospontocoleta,endereco=endereco)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: editarPontoColeta
@@ -1636,26 +1638,27 @@ def visualizarPontoColetaResiduo(idpontocoletaresiduo):
     form.periodicidade.data  = pontocoletaresiduo.cod_periodicidade
     form.tipoveiculo.data  = pontocoletaresiduo.cod_tipoveiculo
     form.status.data = pontocoletaresiduo.status_pontocoleta_residuo
-    return render_template('visualizarPontoColetaResiduo.html', titulo='Visualizar Resíduo', idpontocoleta=idpontocoleta, form=form)   
+    return render_template('visualizarPontoColetaResiduo.html', titulo='Visualizar Resíduo', idpontocoletaresiduo=idpontocoletaresiduo,idpontocoleta=idpontocoleta, form=form)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: editarPontoColetaResiduo
 ##FUNÇÃO: formulario de visualização
 #PODE ACESSAR: administrador
 #---------------------------------------------------------------------------------------------------------------------------------
-@app.route('/editarPontoColetaResiduo/<int:id>')
-def editarPontoColetaResiduo(id):
+@app.route('/editarPontoColetaResiduo/<int:idpontocoletaresiduo>')
+def editarPontoColetaResiduo(idpontocoletaresiduo):
     if 'usuario_logado' not in session or session['usuario_logado'] == None:
         flash('Sessão expirou, favor logar novamente','danger')
         return redirect(url_for('login',proxima=url_for('editarPontoColetaResiduo')))  
-    pontocoletaresiduo = tb_pontocoleta_residuo.query.filter_by(cod_pontocoleta_residuo=id).first()
+    pontocoletaresiduo = tb_pontocoleta_residuo.query.filter_by(cod_pontocoleta_residuo=idpontocoletaresiduo).first()
+    idpontocoleta = pontocoletaresiduo.cod_pontocoleta
     form = frm_editar_pontocoleta_residuo()
     form.acondicionamento.data  = pontocoletaresiduo.cod_acondicionamento
     form.residuo.data  = pontocoletaresiduo.cod_residuo
     form.periodicidade.data  = pontocoletaresiduo.cod_periodicidade
     form.tipoveiculo.data  = pontocoletaresiduo.cod_tipoveiculo
     form.status.data = pontocoletaresiduo.status_pontocoleta_residuo
-    return render_template('editarPontoColetaResiduo.html', titulo='Editar Resíduo', id=id, form=form)   
+    return render_template('editarPontoColetaResiduo.html', titulo='Editar Resíduo', idpontocoletaresiduo=idpontocoletaresiduo,idpontocoleta=idpontocoleta,form=form)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
 #ROTA: atualizarPontoColetaResiduo
@@ -1669,8 +1672,9 @@ def atualizarPontoColetaResiduo():
         return redirect(url_for('login',proxima=url_for('atualizarPontoColetaResiduo')))      
     form = frm_editar_pontocoleta_residuo(request.form)
     if form.validate_on_submit():
-        id = request.form['id']
-        pontocoletaresiduo = tb_pontocoleta_residuo.query.filter_by(cod_pontocoleta_residuo=id).first()
+        idpontocoletaresiduo = request.form['idpontocoletaresiduo']
+        idpontocoleta = request.form['idpontocoleta']
+        pontocoletaresiduo = tb_pontocoleta_residuo.query.filter_by(cod_pontocoleta_residuo=idpontocoletaresiduo).first()
         pontocoletaresiduo.cod_residuo = form.residuo.data
         pontocoletaresiduo.cod_acondicionamento = form.acondicionamento.data
         pontocoletaresiduo.cod_tipoveiculo = form.tipoveiculo.data
@@ -1680,4 +1684,4 @@ def atualizarPontoColetaResiduo():
         flash('Resíduo atualizado com sucesso!','success')
     else:
         flash('Favor verificar os campos!','danger')
-    return redirect(url_for('visualizarPontoColetaResiduo', id=request.form['id'])) 
+    return redirect(url_for('visualizarPontoColetaResiduo', idpontocoleta=idpontocoleta,idpontocoletaresiduo=idpontocoletaresiduo)) 

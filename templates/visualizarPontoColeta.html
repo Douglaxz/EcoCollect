@@ -1,5 +1,6 @@
   {% extends "template.html"%}
   {% block conteudo %}
+ 
   <div class="box_cabecalho">
     <div class="box_titulo_interno">
       <i class="bi bi-geo" data-toggle="tooltip" data-placement="right" title="Tipo Veículo"></i> {{ titulo }}
@@ -42,7 +43,7 @@
   <table class="table table-bordered table-responsiv table-hover">
       <thead>
           <tr>
-            <th width="40%">Resíudo</th>
+            <th width="40%">Resíduo</th>
             <th width="40%">Acondicionamento</th>
             <th width="10%">Status</th>
             <th width="10%">Ações</th>
@@ -66,5 +67,24 @@
           {% endfor %}
       </tbody>
   </table>
+</div>
+<div class="box_cabecalho">
+  <div class="box_titulo_interno">
+    <i class="bi bi-map" data-toggle="tooltip" data-placement="right"></i> Mapa
+  </div>
+  <div class="box_botoes">
+    &nbsp;
+  </div>
+</div>
+<div class="boxcentral">
+<iframe
+  width="100%"
+  height="450"
+  style="border:0"
+  loading="lazy"
+  allowfullscreen
+  referrerpolicy="no-referrer-when-downgrade"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAeXUvxM9-cljdisWlcah4WFWAe5BJ2NvQ&q={{ endereco }}">
+</iframe>
 </div>
 {% endblock%}
