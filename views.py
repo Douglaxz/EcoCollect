@@ -1614,7 +1614,14 @@ def criarPontoColetaResiduo(idpontocoleta):
     periodicidade = form.periodicidade.data 
     tipoveiculo = form.tipoveiculo.data 
     status = form.status.data
-    novoPontoColetaResiduo = tb_pontocoleta_residuo(cod_pontocoleta=pontocoleta, cod_periodicidade=periodicidade, cod_acondicionamento=acondicionamento, cod_tipoveiculo=tipoveiculo, cod_residuo=residuo, status_pontocoleta_residuo=status)
+    dom = form.diadom.data
+    seg = form.diaseg.data
+    ter = form.diater.data
+    qua = form.diaqua.data
+    qui = form.diaqui.data
+    sex = form.diasex.data
+    sab = form.diasab.data 
+    novoPontoColetaResiduo = tb_pontocoleta_residuo(cod_pontocoleta=pontocoleta, cod_periodicidade=periodicidade, cod_acondicionamento=acondicionamento, cod_tipoveiculo=tipoveiculo, cod_residuo=residuo, status_pontocoleta_residuo=status,colDom_pontocoleta_residuo=dom,colSeg_pontocoleta_residuo=colDom_pontocoleta_residuo,colTer_pontocoleta_residuo=ter,colQua_pontocoleta_residuo=qua,colQui_pontocoleta_residuo=qui,colSex_pontocoleta_residuo=sex,colSab_pontocoleta_residuo=sab)
     flash('Periodicidade criada com sucesso!','success')
     db.session.add(novoPontoColetaResiduo)
     db.session.commit()
@@ -1638,6 +1645,13 @@ def visualizarPontoColetaResiduo(idpontocoletaresiduo):
     form.periodicidade.data  = pontocoletaresiduo.cod_periodicidade
     form.tipoveiculo.data  = pontocoletaresiduo.cod_tipoveiculo
     form.status.data = pontocoletaresiduo.status_pontocoleta_residuo
+    form.diadom.data = pontocoletaresiduo.colDom_pontocoleta_residuo
+    form.diaseg.data = pontocoletaresiduo.colSeg_pontocoleta_residuo
+    form.diater.data = pontocoletaresiduo.colTer_pontocoleta_residuo
+    form.diaqua.data = pontocoletaresiduo.colQua_pontocoleta_residuo
+    form.diaqui.data = pontocoletaresiduo.colQui_pontocoleta_residuo
+    form.diasex.data = pontocoletaresiduo.colSex_pontocoleta_residuo
+    form.diasab.data = pontocoletaresiduo.colSab_pontocoleta_residuo
     return render_template('visualizarPontoColetaResiduo.html', titulo='Visualizar Resíduo', idpontocoletaresiduo=idpontocoletaresiduo,idpontocoleta=idpontocoleta, form=form)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -1658,6 +1672,14 @@ def editarPontoColetaResiduo(idpontocoletaresiduo):
     form.periodicidade.data  = pontocoletaresiduo.cod_periodicidade
     form.tipoveiculo.data  = pontocoletaresiduo.cod_tipoveiculo
     form.status.data = pontocoletaresiduo.status_pontocoleta_residuo
+    form.status.data = pontocoletaresiduo.status_pontocoleta_residuo
+    form.diadom.data = pontocoletaresiduo.colDom_pontocoleta_residuo
+    form.diaseg.data = pontocoletaresiduo.colSeg_pontocoleta_residuo
+    form.diater.data = pontocoletaresiduo.colTer_pontocoleta_residuo
+    form.diaqua.data = pontocoletaresiduo.colQua_pontocoleta_residuo
+    form.diaqui.data = pontocoletaresiduo.colQui_pontocoleta_residuo
+    form.diasex.data = pontocoletaresiduo.colSex_pontocoleta_residuo
+    form.diasab.data = pontocoletaresiduo.colSab_pontocoleta_residuo
     return render_template('editarPontoColetaResiduo.html', titulo='Editar Resíduo', idpontocoletaresiduo=idpontocoletaresiduo,idpontocoleta=idpontocoleta,form=form)   
 
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -1679,6 +1701,14 @@ def atualizarPontoColetaResiduo():
         pontocoletaresiduo.cod_acondicionamento = form.acondicionamento.data
         pontocoletaresiduo.cod_tipoveiculo = form.tipoveiculo.data
         pontocoletaresiduo.status_periodicidade = form.status.data
+        pontocoletaresiduo.status_pontocoleta_residuo = form.status.data
+        pontocoletaresiduo.colDom_pontocoleta_residuo = form.diadom.data
+        pontocoletaresiduo.colSeg_pontocoleta_residuo = form.diaseg.data
+        pontocoletaresiduo.colTer_pontocoleta_residuo = form.diater.data
+        pontocoletaresiduo.colQua_pontocoleta_residuo = form.diaqua.data
+        pontocoletaresiduo.colQui_pontocoleta_residuo = form.diaqui.data
+        pontocoletaresiduo.colSex_pontocoleta_residuo = form.diasex.data
+        pontocoletaresiduo.colSab_pontocoleta_residuo = form.diasab.data
         db.session.add(pontocoletaresiduo)
         db.session.commit()
         flash('Resíduo atualizado com sucesso!','success')

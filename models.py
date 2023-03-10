@@ -143,5 +143,12 @@ class tb_pontocoleta_residuo(db.Model):
     cod_periodicidade = db.Column(db.Integer, nullable=False)
     cod_tipoveiculo = db.Column(db.Integer, nullable=False)
     status_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    colDom_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    colSeg_pontocoleta_residuo = db.Column(db.Integer, nullable=False) 
+    colTer_pontocoleta_residuo = db.Column(db.Integer, nullable=False) 
+    colQua_pontocoleta_residuo = db.Column(db.Integer, nullable=False) 
+    colQui_pontocoleta_residuo = db.Column(db.Integer, nullable=False) 
+    colSex_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    colSab_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
     def __repr__(self):
         return '<Name %r>' % self.name
