@@ -6,6 +6,8 @@ from flask_bcrypt import generate_password_hash, Bcrypt
 from flask_qrcode import QRcode
 from flask_googlemaps import GoogleMaps
 
+from chaveGoogle import API_KEY
+
 
 # definição de chave
 app = Flask(__name__)
@@ -17,7 +19,7 @@ bcrypt = Bcrypt(app)
 qrcode = QRcode(app)
 
 # you can set key as config
-app.config['GOOGLEMAPS_KEY'] = "AIzaSyA7bWAPSaIKv-8Q0X3g-G2m385_r_-Vcvs"
+app.config['GOOGLEMAPS_KEY'] = API_KEY
 
 
 # Initialize the extension
