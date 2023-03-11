@@ -132,7 +132,7 @@ class tb_periodicidade(db.Model):
         return '<Name %r>' % self.name    
 
 #---------------------------------------------------------------------------------------------------------------------------------
-#TABELA: PONTO S DE COLETA RESIDUO
+#TABELA: PONTOS DE COLETA RESIDUO
 #ORIGEM: BANCO DE DADOS
 #---------------------------------------------------------------------------------------------------------------------------------
 class tb_pontocoleta_residuo(db.Model):
@@ -150,5 +150,34 @@ class tb_pontocoleta_residuo(db.Model):
     colQui_pontocoleta_residuo = db.Column(db.Integer, nullable=False) 
     colSex_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
     colSab_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    def __repr__(self):
+        return '<Name %r>' % self.name
+    
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: ROTAS
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_rotas(db.Model):
+    cod_rota = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    desc_rota = db.Column(db.String(50), nullable=False)
+    status_rota = db.Column(db.Integer, nullable=False)
+    cod_veiculo = db.Column(db.Integer, nullable=False)
+    cod_motorista = db.Column(db.Integer, nullable=False)
+    diasemana_rota = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#TABELA: PONTO DE COLETA ROTAS
+#ORIGEM: BANCO DE DADOS
+#---------------------------------------------------------------------------------------------------------------------------------
+class tb_rotas_pontocoletaresiduos(db.Model):
+    cod_rotas_pontocoletaresiduos = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    status_rotas_pontocoletaresiduos = db.Column(db.Integer, nullable=False)
+    ordem_rotas_pontocoletaresiduos = db.Column(db.Integer, nullable=False)
+    cod_pontocoleta_residuo = db.Column(db.Integer, nullable=False)
+    cod_rota = db.Column(db.Integer, nullable=False)
+
     def __repr__(self):
         return '<Name %r>' % self.name

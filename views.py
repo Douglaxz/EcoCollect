@@ -17,7 +17,9 @@ from models import tb_user,\
     tb_pontoscoleta,\
     tb_periodicidade,\
     tb_acondicionamento,\
-    tb_pontocoleta_residuo
+    tb_pontocoleta_residuo,\
+    tb_rotas,\
+    tb_rotas_pontocoletaresiduos
 from helpers import \
     frm_pesquisa, \
     frm_editar_senha,\
@@ -44,7 +46,11 @@ from helpers import \
     frm_editar_periodicidade,\
     frm_visualizar_periodicidade,\
     frm_editar_pontocoleta_residuo,\
-    frm_visualizar_pontocoleta_residuo
+    frm_visualizar_pontocoleta_residuo,\
+    frm_editar_rota,\
+    frm_visualizar_rota,\
+    frm_editar_rotas_pontocoletaresiduos,\
+    frm_visualizar_rotas_pontocoletaresiduos
 
 
 # ITENS POR PÁGINA
@@ -1621,7 +1627,7 @@ def criarPontoColetaResiduo(idpontocoleta):
     qui = form.diaqui.data
     sex = form.diasex.data
     sab = form.diasab.data 
-    novoPontoColetaResiduo = tb_pontocoleta_residuo(cod_pontocoleta=pontocoleta, cod_periodicidade=periodicidade, cod_acondicionamento=acondicionamento, cod_tipoveiculo=tipoveiculo, cod_residuo=residuo, status_pontocoleta_residuo=status,colDom_pontocoleta_residuo=dom,colSeg_pontocoleta_residuo=colDom_pontocoleta_residuo,colTer_pontocoleta_residuo=ter,colQua_pontocoleta_residuo=qua,colQui_pontocoleta_residuo=qui,colSex_pontocoleta_residuo=sex,colSab_pontocoleta_residuo=sab)
+    novoPontoColetaResiduo = tb_pontocoleta_residuo(cod_pontocoleta=pontocoleta, cod_periodicidade=periodicidade, cod_acondicionamento=acondicionamento, cod_tipoveiculo=tipoveiculo, cod_residuo=residuo, status_pontocoleta_residuo=status,colDom_pontocoleta_residuo=dom,colSeg_pontocoleta_residuo=seg,colTer_pontocoleta_residuo=ter,colQua_pontocoleta_residuo=qua,colQui_pontocoleta_residuo=qui,colSex_pontocoleta_residuo=sex,colSab_pontocoleta_residuo=sab)
     flash('Periodicidade criada com sucesso!','success')
     db.session.add(novoPontoColetaResiduo)
     db.session.commit()
@@ -1714,4 +1720,289 @@ def atualizarPontoColetaResiduo():
         flash('Resíduo atualizado com sucesso!','success')
     else:
         flash('Favor verificar os campos!','danger')
-    return redirect(url_for('visualizarPontoColetaResiduo', idpontocoleta=idpontocoleta,idpontocoletaresiduo=idpontocoletaresiduo)) 
+    return redirect(url_for('visualizarPontoColetaResiduo', idpontocoleta=idpontocoleta,idpontocoletaresiduo=idpontocoletaresiduo))
+
+##################################################################################################################################
+#ROTAS
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: rota
+#FUNÇÃO: listar informações
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/rota', methods=['POST','GET'])
+def rota():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('rota')))         
+    page = request.args.get('page', 1, type=int)
+    form = frm_pesquisa()   
+    pesquisa = form.pesquisa.data
+    if pesquisa == "":
+        pesquisa = form.pesquisa_responsiva.data
+    
+    if pesquisa == "" or pesquisa == None:     
+        rotas = tb_rotas.query.order_by(tb_rotas.desc_rota)\
+        .paginate(page=page, per_page=ROWS_PER_PAGE , error_out=False)
+    else:
+        rotas = tb_rotas.query.order_by(tb_rotas.desc_rota)\
+        .filter(tb_acondicionamento.desc_acondicionamento.ilike(f'%{pesquisa}%'))\
+        .paginate(page=page, per_page=ROWS_PER_PAGE, error_out=False)        
+    return render_template('rota.html', titulo='Rotas', rotas=rotas, form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoRota
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoRota')
+def novoRota():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoRota'))) 
+    form = frm_editar_rota()
+    return render_template('novoRota.html', titulo='Nova Rota', form=form)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarRota
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarRota', methods=['POST',])
+def criarRota():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('criarRota')))     
+    form = frm_editar_rota(request.form)
+    if not form.validate_on_submit():
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('criarRota'))
+    desc  = form.descricao.data
+    veiculo = form.veiculo.data
+    motorista = form.motorista.data
+    diasemana = form.diadasemana.data
+    status = form.status.data
+    rota = tb_rotas.query.filter_by(desc_rota=desc).first()
+    if rota:
+        flash ('Rota já existe','danger')
+        return redirect(url_for('acondicionamento')) 
+    novoRota = tb_rotas(desc_rota=desc, status_rota=status, cod_motorista=motorista, cod_veiculo=veiculo, diasemana_rota=diasemana)
+    flash('Rota criada com sucesso!','success')
+    db.session.add(novoRota)
+    db.session.commit()
+    return redirect(url_for('rota'))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarRota
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarRota/<int:id>')
+def visualizarRota(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarRota')))  
+    rota = tb_rotas.query.filter_by(cod_rota=id).first()
+
+    
+    rotas_pontocoletaresiduos = tb_rotas_pontocoletaresiduos.query.order_by(tb_rotas_pontocoletaresiduos.ordem_rotas_pontocoletaresiduos)\
+        .filter(tb_rotas_pontocoletaresiduos.cod_rota == id)\
+        .join(tb_pontocoleta_residuo, tb_pontocoleta_residuo.cod_pontocoleta_residuo==tb_rotas_pontocoletaresiduos.cod_pontocoleta_residuo)\
+        .join(tb_pontoscoleta, tb_pontoscoleta.cod_pontocoleta==tb_pontocoleta_residuo.cod_pontocoleta)\
+        .join(tb_residuos, tb_pontocoleta_residuo.cod_residuo==tb_residuos.cod_residuo)\
+        .add_columns(tb_rotas_pontocoletaresiduos.cod_rotas_pontocoletaresiduos, tb_pontoscoleta.nome_pontocoleta, tb_residuos.desc_residuo,tb_rotas_pontocoletaresiduos.status_rotas_pontocoletaresiduos)\
+
+
+    form = frm_visualizar_rota()
+    form.descricao.data = rota.desc_rota
+    form.status.data = rota.status_rota
+    form.veiculo.data = rota.cod_veiculo
+    form.motorista.data = rota.cod_motorista
+    form.diadasemana.data = rota.diasemana_rota
+    return render_template('visualizarRota.html', titulo='Visualizar Rota', id=id, form=form, rotas_pontocoletaresiduos=rotas_pontocoletaresiduos )   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarRota
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarRota/<int:id>')
+def editarRota(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarRota')))  
+    rota = tb_rotas.query.filter_by(cod_rota=id).first()
+    form = frm_editar_rota()
+    form.descricao.data = rota.desc_rota
+    form.status.data = rota.status_rota
+    form.veiculo.data = rota.cod_veiculo
+    form.motorista.data = rota.cod_motorista
+    form.diadasemana.data = rota.diasemana_rota
+    return render_template('editarRota.html', titulo='Editar Rota', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarRota
+#FUNÇÃO: alteração no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarRota', methods=['POST',])
+def atualizarRota():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarRota')))      
+    form = frm_editar_rota(request.form)
+    if form.validate_on_submit():
+        id = request.form['id']
+        rota = tb_rotas.query.filter_by(cod_rota=request.form['id']).first()
+        rota.desc_rota = form.descricao.data
+        rota.status_rota = form.status.data
+        rota.diasemana_rota = form.diadasemana.data
+        rota.cod_veiculo = form.veiculo.data
+        rota.cod_motorista = form.motorista.data
+        db.session.add(rota)
+        db.session.commit()
+        flash('Rota atualizada com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarRota', id=request.form['id'])) 
+
+##################################################################################################################################
+#ROTAS - PONTO COLETA RESIDUO
+##################################################################################################################################
+
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: novoRotaPontoColetaResiduos
+#FUNÇÃO: formulario de cadastro
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/novoRotaPontoColetaResiduos/<int:idrota>')
+def novoRotaPontoColetaResiduos(idrota):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoRotaPontoColetaResiduos'))) 
+    form = frm_editar_rotas_pontocoletaresiduos()
+
+    #criar uma tupla com os caracteres
+    #faz um sql
+    #gera um txt
+
+    valores = tb_pontocoleta_residuo.query.filter_by(status_pontocoleta_residuo=0)\
+            .join(tb_residuos, tb_residuos.cod_residuo==tb_pontocoleta_residuo.cod_residuo)\
+            .join(tb_pontoscoleta, tb_pontoscoleta.cod_pontocoleta==tb_pontocoleta_residuo.cod_pontocoleta)\
+            .add_columns(tb_pontocoleta_residuo.cod_pontocoleta_residuo, tb_pontoscoleta.nome_pontocoleta, tb_residuos.desc_residuo)\
+            .order_by(tb_pontoscoleta.nome_pontocoleta).all()
+
+    options = [(str(valores.cod_pontocoleta_residuo), f"{valores.nome_pontocoleta} - {valores.desc_residuo}") for valores in valores]
+    form.pontocoleta_residuo.choices = options
+
+    return render_template('novoRotaPontoColetaResiduos.html', titulo='Nova Rota | Ponto de Coleta | Resíduos', form=form, idrota=idrota)
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: criarRotaPontoColetaResiduos
+#FUNÇÃO: inclusão no banco de dados
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/criarRotaPontoColetaResiduos', methods=['POST',])
+def criarRotaPontoColetaResiduos():
+    idrota = request.form['idrota']
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('novoRotaPontoColetaResiduos')))     
+    form = frm_editar_rotas_pontocoletaresiduos(request.form)
+    
+    ordem  = form.ordem.data
+    pontocoletaresiduo = form.pontocoleta_residuo.data
+    status = form.status.data
+    
+
+    if (ordem == None):
+        flash('Por favor, preencha todos os dados','danger')
+        return redirect(url_for('novoRotaPontoColetaResiduos',idrota=idrota))
+    
+
+    novarotaspontocoletaresiduos = tb_rotas_pontocoletaresiduos(ordem_rotas_pontocoletaresiduos=ordem, status_rotas_pontocoletaresiduos=status, cod_pontocoleta_residuo=pontocoletaresiduo, cod_rota=idrota)
+    flash('Rota | Ponto de coleta | Resíduo | criada com sucesso!','success')
+    db.session.add(novarotaspontocoletaresiduos)
+    db.session.commit()
+    return redirect(url_for('visualizarRota',id=idrota))
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: visualizarRotaPontoColetaResiduos
+#FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#--------------------------------------------------------------------------------------------------------------------------------- 
+@app.route('/visualizarRotaPontoColetaResiduos/<int:id>')
+def visualizarRotaPontoColetaResiduos(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('visualizarRotaPontoColetaResiduos')))  
+    rotaspontocoletaresiduos = tb_rotas_pontocoletaresiduos.query.filter_by(cod_rotas_pontocoletaresiduos=id).first()
+    valores = tb_pontocoleta_residuo.query.filter_by(status_pontocoleta_residuo=0)\
+            .join(tb_residuos, tb_residuos.cod_residuo==tb_pontocoleta_residuo.cod_residuo)\
+            .join(tb_pontoscoleta, tb_pontoscoleta.cod_pontocoleta==tb_pontocoleta_residuo.cod_pontocoleta)\
+            .add_columns(tb_pontocoleta_residuo.cod_pontocoleta_residuo, tb_pontoscoleta.nome_pontocoleta, tb_residuos.desc_residuo)\
+            .order_by(tb_pontoscoleta.nome_pontocoleta).all()
+
+    options = [(str(valores.cod_pontocoleta_residuo), f"{valores.nome_pontocoleta} - {valores.desc_residuo}") for valores in valores]
+    form = frm_visualizar_rotas_pontocoletaresiduos()
+    form.pontocoleta_residuo.choices = options
+
+
+    
+    form.ordem.data = rotaspontocoletaresiduos.ordem_rotas_pontocoletaresiduos
+    form.status.data = rotaspontocoletaresiduos.status_rotas_pontocoletaresiduos
+    form.pontocoleta_residuo.data = rotaspontocoletaresiduos.cod_pontocoleta_residuo
+    return render_template('visualizarRotaPontoColetaResiduos.html', titulo='Visualizar Rota | Ponto de Coleta | Resíduos', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: editarRotaPontoColetaResiduos
+##FUNÇÃO: formulario de visualização
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/editarRotaPontoColetaResiduos/<int:id>')
+def editarRotaPontoColetaResiduos(id):
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('editarRotaPontoColetaResiduos')))  
+    form = frm_editar_rotas_pontocoletaresiduos()
+    rotaspontocoletaresiduos = tb_rotas_pontocoletaresiduos.query.filter_by(cod_rotas_pontocoletaresiduos=id).first()
+
+    valores = tb_pontocoleta_residuo.query.filter_by(status_pontocoleta_residuo=0)\
+            .join(tb_residuos, tb_residuos.cod_residuo==tb_pontocoleta_residuo.cod_residuo)\
+            .join(tb_pontoscoleta, tb_pontoscoleta.cod_pontocoleta==tb_pontocoleta_residuo.cod_pontocoleta)\
+            .add_columns(tb_pontocoleta_residuo.cod_pontocoleta_residuo, tb_pontoscoleta.nome_pontocoleta, tb_residuos.desc_residuo)\
+            .order_by(tb_pontoscoleta.nome_pontocoleta).all()
+
+    options = [(str(valores.cod_pontocoleta_residuo), f"{valores.nome_pontocoleta} - {valores.desc_residuo}") for valores in valores]
+    form.pontocoleta_residuo.choices = options
+
+    form.ordem.data = rotaspontocoletaresiduos.ordem_rotas_pontocoletaresiduos
+    form.status.data = rotaspontocoletaresiduos.status_rotas_pontocoletaresiduos
+    form.pontocoleta_residuo.data = rotaspontocoletaresiduos.cod_pontocoleta_residuo
+    return render_template('editarRotaPontoColetaResiduos.html', titulo='Editar Rota | Ponto de Coleta | Resíduos', id=id, form=form)   
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#ROTA: atualizarRota
+#FUNÇÃO: alteração no banco de dados
+#PODE ACESSAR: administrador
+#---------------------------------------------------------------------------------------------------------------------------------
+@app.route('/atualizarRotaPontoColetaResiduos', methods=['POST',])
+def atualizarRotaPontoColetaResiduos():
+    if 'usuario_logado' not in session or session['usuario_logado'] == None:
+        flash('Sessão expirou, favor logar novamente','danger')
+        return redirect(url_for('login',proxima=url_for('atualizarRotaPontoColetaResiduos')))      
+    form = frm_editar_rotas_pontocoletaresiduos(request.form)
+    if (form.ordem.data != None):
+        id = request.form['id']
+        rotaspontocoletaresiduos = tb_rotas_pontocoletaresiduos.query.filter_by(cod_rotas_pontocoletaresiduos=id).first()
+        rotaspontocoletaresiduos.ordem_rotas_pontocoletaresiduos = form.ordem.data
+        rotaspontocoletaresiduos.status_rota = form.status.data
+        rotaspontocoletaresiduos.cod_pontocoleta_residuo = form.pontocoleta_residuo.data
+        db.session.add(rotaspontocoletaresiduos)
+        db.session.commit()
+        flash('Rota | Ponto de coleta | Resíduo | atualizada com sucesso!','success')
+    else:
+        flash('Favor verificar os campos!','danger')
+    return redirect(url_for('visualizarRotaPontoColetaResiduos', id=request.form['id'])) 

@@ -353,4 +353,60 @@ class frm_visualizar_pontocoleta_residuo(FlaskForm):
     diasex = BooleanField('Sexta:', render_kw={'readonly': True})
     diasab = BooleanField('Sábado:', render_kw={'readonly': True})    
     salvar = SubmitField('Editar', render_kw={'readonly': True})
-    salvar = SubmitField('Salvar')  
+    salvar = SubmitField('Salvar') 
+
+##################################################################################################################################
+#ROTAS
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: rotas
+#TIPO: edição
+#TABELA: tb_rotas
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_rota(FlaskForm):
+    descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={"placeholder": "digite o nome da rota"})
+    diadasemana = SelectField('Situação:', coerce=int, choices=[(0, 'DOM'),(1, 'SEG'),(2, 'TER'),(3, 'QUA'),(4, 'QUI'),(5, 'SEX'),(7, 'SAB')])
+    veiculo = SelectField('Veículo:', coerce=int, choices=[(g.cod_veiculo, g.placa_veiculo) for g in tb_veiculos.query.order_by('placa_veiculo')])
+    motorista = SelectField('Motorista:', coerce=int, choices=[(g.cod_motorista, g.nome_motorista) for g in tb_motoristas.query.order_by('nome_motorista')])
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    salvar = SubmitField('Salvar')    
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: rotas
+#TIPO: visualização
+#TABELA: tb_rotas
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_rota(FlaskForm):
+    descricao = StringField('Nome:', [validators.DataRequired(), validators.Length(min=1, max=50)], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    diadasemana = SelectField('Situação:', coerce=int, choices=[(0, 'DOM'),(1, 'SEG'),(2, 'TER'),(3, 'QUA'),(4, 'QUI'),(5, 'SEX'),(7, 'SAB')], render_kw={'readonly': True})
+    veiculo = SelectField('Veículo:', coerce=int, choices=[(g.cod_veiculo, g.placa_veiculo) for g in tb_veiculos.query.order_by('placa_veiculo')], render_kw={'readonly': True})
+    motorista = SelectField('Motorista:', coerce=int, choices=[(g.cod_motorista, g.nome_motorista) for g in tb_motoristas.query.order_by('nome_motorista')], render_kw={'readonly': True})    
+    salvar = SubmitField('Salvar')
+
+##################################################################################################################################
+#ROTAS / PONTO COLETA RESÍDUOS
+##################################################################################################################################
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: rotas / ponto coleta residuos
+#TIPO: edição
+#TABELA: tb_rotas
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_editar_rotas_pontocoletaresiduos(FlaskForm):
+    ordem = IntegerField('Ordem de execução:', [validators.DataRequired()], render_kw={"placeholder": "digite a ordem de execução deste ponto"})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')])
+    pontocoleta_residuo = SelectField('Ponto de Coleta | Resíduo:', coerce=int, choices=[])
+
+
+
+#---------------------------------------------------------------------------------------------------------------------------------
+#FORMUÁRIO: rotas / ponto coleta residuos
+#TIPO: visualização
+#TABELA: tb_rotas
+#---------------------------------------------------------------------------------------------------------------------------------
+class frm_visualizar_rotas_pontocoletaresiduos(FlaskForm):
+    ordem = IntegerField('Ordem de execução:', [validators.DataRequired()], render_kw={'readonly': True})
+    status = SelectField('Situação:', coerce=int, choices=[(0, 'Ativo'),(1, 'Inativo')], render_kw={'readonly': True})
+    pontocoleta_residuo = SelectField('Ponto de Coleta | Resíduo:', coerce=int, choices=[], render_kw={'readonly': True})
