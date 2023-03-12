@@ -1,7 +1,13 @@
  # Sistema de gerenciamento de coleta de resíduos de grandes geradores - EcoCollect
 
  ## :computer: Descrição do projeto:
- Este projeto visa contemplar as funcionalidades de um sistema de gerenciamento de coleta de resíduos de grandes geradores
+ Este é o repositório do projeto Eco Collet, um sistema desenvolvido para coleta e gerenciamento de resíduos de grandes geradores. O objetivo do sistema é auxiliar empresas e indústrias no gerenciamento adequado de seus resíduos, promovendo a sustentabilidade e a preservação do meio ambiente.
+
+O Eco Collet foi desenvolvido utilizando tecnologias como HTML, CSS, JavaScript, Python e MySQL, e conta com recursos como cadastro de geradores, agendamento de coletas, controle de recursos e geração de relatórios.
+
+Nosso projeto tem como missão contribuir para a conscientização ambiental e promover a responsabilidade social. Estamos sempre buscando melhorar e aprimorar nossas funcionalidades, e aceitamos sugestões e contribuições da comunidade de desenvolvedores.
+
+Se você se interessa por tecnologia e sustentabilidade, confira nosso repositório e junte-se a nós nessa causa!
 
 ## :video_camera: Amostra do projeto:
 em desenvolvimento
