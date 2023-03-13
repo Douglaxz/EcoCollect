@@ -20,6 +20,7 @@ Estapas para rodar o projeto
 - Instalar flask (caso não tenha instalado)
 - Instalar flask-bcrypt (caso não tenha instalado)
 - Instalar flask-google maps
+- Gerar uma chave api para utilização dos mapas do google
 - Baixar o banco de dados (aguardando finalização do projeto)
 - executar o comando: python ecocollect.py no terminal
 
