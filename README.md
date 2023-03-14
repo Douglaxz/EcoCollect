@@ -10,7 +10,10 @@ Nosso projeto tem como missão contribuir para a conscientização ambiental e p
 Se você se interessa por tecnologia e sustentabilidade, confira nosso repositório e junte-se a nós nessa causa!
 
 ## :video_camera: Amostra do projeto:
-em desenvolvimento
+[<img src="https://github.com/Douglaxz/EcoCollect/blob/main/miniatura.png" width="100%">](https://youtu.be/CmHGZ3gtn4Q "Eco Collect")
+
+
+
 
 ## :rocket: Começando:
 Essas instruções permitirão que você obtenha uma cópia do projeto em operação na sua máquina local para fins de desenvolvimento e teste.
